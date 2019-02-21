@@ -50,7 +50,7 @@ public class BIOClient {
         socket.close();
     }
     public static void main(String[] args) throws IOException {
-        BIOClient client =new BIOClient(new Socket("127.0.0.1",54545));
+        BIOClient client =new BIOClient(new Socket("127.0.0.1",12121));
         Scanner sc =new Scanner(System.in);
         String command =null;
         while (true){
