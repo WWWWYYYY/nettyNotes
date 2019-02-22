@@ -51,13 +51,14 @@ public class AIOClient {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        String NEW_LINE = System.getProperty("line.separator");
         AIOClient client =new AIOClient();
-        Thread.sleep(2000);
+        Thread.sleep(2000);//调用socketChannel.connect不能马上发送，还不知道连接成功没有
         String str ="";
         for (int i=0;i<40;i++){
             str+=new Date().toString();
         }
-        client.sendMsg(str);
+        client.sendMsg(str+NEW_LINE);
     }
 
 }

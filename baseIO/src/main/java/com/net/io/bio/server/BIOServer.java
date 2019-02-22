@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 public class BIOServer {
     private final String IP = "127.0.0.1";
-    private final int PORT = 54545;
+    private final int PORT = 12121;
     private Executor executor = Executors.newFixedThreadPool(10);
     private ServerSocket server;
 
