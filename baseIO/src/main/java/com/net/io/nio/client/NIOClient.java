@@ -25,9 +25,6 @@ public class NIOClient {
         public HandleThread(Selector selector, SocketChannel socketChannel) throws IOException {
             this.selector=selector;
             this.socketChannel=socketChannel;
-            //todo 到时候测试阻塞是什么状态
-
-//            socketChannel.configureBlocking(false);
             running =true;
         }
 
@@ -116,7 +113,7 @@ public class NIOClient {
         //如果为 true，则此通道将被置于阻塞模式；socketChannel.connect连接不成功会一直阻塞，
         // 如果为 false，则此通道将被置于非阻塞模式；socketChannel.connect不管结果如何都不会阻塞，
         // 如果没有成功通过监听连接事件，监听到以后调用socketChannel.finishConnect方法完成连接操作
-        //ps：在连接之前一定要设置非阻塞，不然监听不到连接事件，整个客户端也不能正常使用，如果要使用阻塞型则直接用BIO，并且使用阻塞型程序写法也不一样了。
+        //ps：在连接之前一定要设置非阻塞，不然监听不到连接事件，整个客户端也不能正常使用，如果要使用阻塞型则直接用BIO，并且使用阻塞型程序写法也不一样了。阻塞情况下用不上selector
         socketChannel.configureBlocking(false);
         boolean result = socketChannel.connect(new InetSocketAddress(HOST, PORT));
         if (!result){
