@@ -6,6 +6,14 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * 1、创建socket设置服务器IP和端口（创建过程中就包含了连接的步骤）
+ * 2、创建一个线程run方法中while循环调用socket读 使得线程阻塞，直到服务端返回数据客户端接收到数据并处理进入下一次循环
+ * 3、客户端发送信息到服务器
+ *
+ * ps：客户端/服务器传递数据都是通过socket的inputStream、outputStream
+ * 第二个步骤必须先执行，如果第三个步骤先执行可能前几次数据上传后不能及时的处理返回的数据。
+ */
 public class BIOClient {
     private Socket socket;
     private PrintWriter pw;

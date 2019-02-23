@@ -10,6 +10,12 @@ import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+/**
+ * 1、创建ServerSocket并绑定端口
+ * 2、ServerSocket实例开始接受客户端并创建对应的Socket，把客户端socket包装成runnable 丢给线程池执行
+ * 3、线程run方法里while循环调用客户端socket读 使得线程阻塞，直到客户端向服务器发送数据，服务端接收到数据以后，
+ * 线程状态变为running，处理数据并返回信息给客户端，此时服务器可以是关闭socket或者是进入下一次循环。
+ */
 public class BIOServer {
     private final String IP = "127.0.0.1";
     private final int PORT = 12121;
