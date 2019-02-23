@@ -35,9 +35,8 @@ public class NIOServer {
         private ServerSocketChannel serverSocketChannel;
         private boolean running =false;
 
-        public HandleThread(Selector selector, ServerSocketChannel serverSocketChannel) {
+        public HandleThread(Selector selector) {
             this.selector = selector;
-            this.serverSocketChannel = serverSocketChannel;
             running=true;
         }
 
@@ -138,7 +137,7 @@ public class NIOServer {
         serverSocketChannel.socket().bind(new InetSocketAddress(PORT));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector,SelectionKey.OP_ACCEPT);
-        new Thread(new HandleThread(selector,serverSocketChannel)).start();
+        new Thread(new HandleThread(selector)).start();
         System.out.println("服务器已启动，端口号："+PORT);
     }
 
