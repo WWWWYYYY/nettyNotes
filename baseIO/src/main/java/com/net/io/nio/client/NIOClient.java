@@ -26,12 +26,10 @@ public class NIOClient {
 
     private class HandleThread implements Runnable {
         private Selector selector;
-        private SocketChannel socketChannel;
         private boolean running =false;
 
-        public HandleThread(Selector selector, SocketChannel socketChannel) throws IOException {
+        public HandleThread(Selector selector) throws IOException {
             this.selector=selector;
-            this.socketChannel=socketChannel;
             running =true;
         }
 
@@ -126,7 +124,7 @@ public class NIOClient {
         if (!result){
             socketChannel.register(selector,SelectionKey.OP_CONNECT);
         }
-        new Thread(new HandleThread(selector,socketChannel)).start();
+        new Thread(new HandleThread(selector)).start();
     }
 
     /**
