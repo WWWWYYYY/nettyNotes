@@ -10,6 +10,21 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 步骤：
+ * 1、打开selector反应器
+ * 2、打开服务端通道
+ * 3、绑定服务端通道对应的socket的端口号
+ * 4、通道设置非阻塞（NIO一定要设置成非阻塞，设置成阻塞代码写法也不一样了）
+ * 5、注册serverSocketChannel的接收事件
+ * 6、启动一条线程 进行事件监听并处理，因为监听事件时selector.select()是阻塞的方法，为不影响主程序运行，才要新启线程
+ *      线程的run方法逻辑处理
+ *      （1）while循环调用selector.select()阻塞线程，直到事件触发
+ *      （2）处理每一个selectionKey事件，并做相应的处理 参考handleKey方法
+ *
+ *
+ * NIO于AIO：AIO向系统注册系统事件监听，由系统调用回调方法；NIO向selector注册selectionKey事件，有selector反应器反馈事件。所以需要一条单独的线程给selector进行事件反馈的操作。
+ */
 public class NIOServer {
     private Selector selector;
     private ServerSocketChannel serverSocketChannel;
@@ -70,7 +85,7 @@ public class NIOServer {
                     byte[] bs =new byte[byteBuffer.remaining()];
                     byteBuffer.get(bs);
                     String msg=new String(bs,"utf-8");
-                    ThreadLogUtil.printMsg("服务器收到【"+channel.getLocalAddress()+"】的信息："+msg);
+                    ThreadLogUtil.printMsg("服务器收到【"+channel.getRemoteAddress()+"】的信息："+msg);
                     String result = dealData(msg);
                     doWrite(channel,result);
                 }

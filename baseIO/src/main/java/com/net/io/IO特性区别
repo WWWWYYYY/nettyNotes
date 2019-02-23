@@ -1,52 +1,55 @@
-BIO出不了高并发，早期的tomcat就是使用BIO 伪异步的方式；会导致服务端内存、cpu消耗过大，因此在服务端不适用BIO编程模型而使用NIO、AIO，
-但由于linux下异步IO并未完善，所以在编程方面要着重NIO，熟悉AIO，毕竟AIO是未来的趋势；而只有客户端才使用BIO。
+相关：
+    在服务端使用BIO处理不了高并发，早期的tomcat就是使用BIO 伪异步的方式；会导致服务端内存、cpu消耗过大，因此在服务端不适用BIO编程模型而使用NIO、AIO，
+    但由于linux下异步IO并未完善，所以在编程方面要着重NIO，熟悉AIO，毕竟AIO是未来的趋势；而只有客户端才使用BIO。
+   netty5基于AIO开发，etty4基于NIO开发，但由于linux下异步IO并未完善netty5暂停开发，netty4正在开发
 
+BIO
+    BIO重点API
+    Socket
+    ServerSocket
+AIO
+    AIO重点API
+    CompletionHandler 由操作系统调用该类中的方法通知应用程序 数据接收成功或者失败的结果，成功时调用complete，失败是调用failed，不论是读还是写都需要需要自己定义一个实现类，用来处理结果。
+        void completed(V result, A attachment); result：结果；attachment附加参数
+        void failed(Throwable exc, A attachment);
 
-netty5基于AIO开发
-netty4基于NIO开发
-但由于linux下异步IO并未完善netty5暂停开发，netty4正在开发
+    AsynchronousServerSocketChannel aio服务端
+    AsynchronousSocketChannel   aio客户端 AsynchronousSocketChannel.open()打开一个通道;connect(ipAndPort)进行连接；close()关闭连接
+    ByteBuffer 缓存区；应用不能直接把内容写入到通道里，必须通过ByteBuffer
+            byte[] bytes = msg.getBytes();//把要写入的内容转变为bytes
+            ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);//申请相应长度的直接内存空间
+            writeBuffer.put(bytes);//放入内容
+            writeBuffer.flip();//
+            clientChannel.write(writeBuffer,writeBuffer, new AioClientWriteHandler(clientChannel,latch));//
 
-BIO重点API
-Socket
-ServerSocket
-
-AIO重点API
-CompletionHandler 由操作系统调用该类中的方法通知应用程序 数据接收成功或者失败的结果，成功时调用complete，失败是调用failed，不论是读还是写都需要需要自己定义一个实现类，用来处理结果。
-    void completed(V result, A attachment); result：结果；attachment附加参数
-    void failed(Throwable exc, A attachment);
-
-AsynchronousServerSocketChannel aio服务端
-AsynchronousSocketChannel   aio客户端 AsynchronousSocketChannel.open()打开一个通道;connect(ipAndPort)进行连接；close()关闭连接
-ByteBuffer 缓存区；应用不能直接把内容写入到通道里，必须通过ByteBuffer
-        byte[] bytes = msg.getBytes();//把要写入的内容转变为bytes
-        ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);//申请相应长度的直接内存空间
-        writeBuffer.put(bytes);//放入内容
-        writeBuffer.flip();//
-        clientChannel.write(writeBuffer,writeBuffer, new AioClientWriteHandler(clientChannel,latch));//
-
-AIO编程 接收信息和发送信息编码思路上不太一样。每当连接、读、写都有对应的CompletionHandler来监听。监听完成和失败的事件
-AIO遗留问题 数据太长分多次发送怎么拼接多个内容。
-
-
+    AIO编程 接收信息和发送信息编码思路上不太一样。每当连接、读、写都有对应的CompletionHandler来监听。监听完成和失败的事件
+    AIO遗留问题 数据太长分多次发送怎么拼接多个内容。
+    AIO异步编程不同于BIO，BIO在连接、读、写、接收时都是使线程处于阻塞状态。而AIO在连接、读、写、接收时时非阻塞的，换句话说AIO在调用连接、读、写、接收时，
+    等同于向系统注册连接、读、写、接收对应的事件。当系统完成时通知应用即可，即通过调用CompletionHandler的complete方法来通知的。因此AIO不需要再为一个客户端创建一个线程来处理socket通信了。
+    AIO和NIO一样使用了通道的概念，并且向通道里读写数据都要通过ByteBuffer。
+    ps：com.net.io.aio是错误的例子；com.net.io.aio2是正确的例子
 
 
 NIO
-**NIO中使用了反应器模式**，反应器的作用类似于监听器，当有客户端发起连接、读、写的事件，则反应器通知相应的accptor调用连接方法，通知相应channel调用读、写方法，反应器主要起到通知作用。于监听器不同的事，反应器只通知一个对象，而监听器会通知所有的监听者。
-   **反应器的演变1**：反应器不在监听编码和解码的事件，把编码和解码的事件推迟到读和写事件之后，从而减去反应器的压力。但是还是存在缺陷，在高并发时还是顶不住。
-   **反应器的演变2**：多反应器模式：新增了主反应器，其主要监听连接事件，子反应器主要监听读和写事件，线程池处理编码和解码。这种方式能够更好的接收更多的连接。
-NIO重要的API:
-Selector:就像一个反应器，可以接收客户端连接收注册客户端对应的channel，并监听这个channel的读、写事件，当发生客户端读/写时通知对应的channel进行读/写
-Channel：客户端连接后创建一个对应客户端的channel(SelectableChannel类型才能注册到selector中)并注册到Selector中。并让Selector监听自己的读/写事件并通知自己。在channel中读写数据都要通过buffer。
-ServerSocketChannel： 服务端通道
-SocketChannel：客户端通道
-DatagramChannel：UDP通道
-SelectionKey：操作事件类型；包括：接收、连接、读、写四个事件。
-服务端ServerSocketChannel能监听的事件类型有：接收
-服务端SocketChannel能监听的事件类型有：读、写
-客户端SocketChannel能监听的事件类型有：连接、读、写
-Ps:不要随便注册读写事件，浪费cpu资源。应当在需要的时候注册
-Buffer：内容传输的容器空间
+    **NIO中使用了反应器模式**，反应器的作用类似于监听器，当有客户端发起连接、读、写的事件，则反应器通知相应的accptor调用连接方法，通知相应channel调用读、写方法，反应器主要起到通知作用。于监听器不同的事，反应器只通知一个对象，而监听器会通知所有的监听者。
+       **反应器的演变1**：反应器不在监听编码和解码的事件，把编码和解码的事件推迟到读和写事件之后，从而减去反应器的压力。但是还是存在缺陷，在高并发时还是顶不住。
+       **反应器的演变2**：多反应器模式：新增了主反应器，其主要监听连接事件，子反应器主要监听读和写事件，线程池处理编码和解码。这种方式能够更好的接收更多的连接。
+    NIO重要的API:
+    Selector:就像一个反应器，可以接收客户端连接收注册客户端对应的channel，并监听这个channel的读、写事件，当发生客户端读/写时通知对应的channel进行读/写
+    Channel：客户端连接后创建一个对应客户端的channel(SelectableChannel类型才能注册到selector中)并注册到Selector中。并让Selector监听自己的读/写事件并通知自己。在channel中读写数据都要通过buffer。
+    ServerSocketChannel： 服务端通道
+    SocketChannel：客户端通道
+    DatagramChannel：UDP通道
+    SelectionKey：操作事件类型；包括：接收、连接、读、写四个事件。
+    服务端ServerSocketChannel能监听的事件类型有：接收
+    服务端SocketChannel能监听的事件类型有：读、写
+    客户端SocketChannel能监听的事件类型有：连接、读、写
+    Ps:不要随便注册读写事件，浪费cpu资源。应当在需要的时候注册
+    Buffer：内容传输的容器空间
 
-BIO、AIO、NIO 客户端和服务端都可以随意搭配。
+
+
+NIO于AIO：AIO向系统注册系统事件监听，由系统调用回调方法；NIO向selector注册selectionKey事件，有selector反应器反馈事件。所以需要一条单独的线程给selector进行事件反馈的操作。
+BIO、AIO、NIO 客户端和服务端都可以随意搭配。正常情况下客户端都是使用BIO,当前情况服务端使用NIO，未来AIO（等待linux真正支持AIO的时候）
 
 Buffer 作为网络编程中重要的一个类必须熟悉他的API 参考 nettyNotes/baseIO/src/main/java/com/net/io/BufferDemo.java

@@ -13,6 +13,7 @@ import java.util.Set;
 
 /**
  * 阻塞模式的NIO 不建议使用 NIO阻塞式还不如直接使用BIO
+ * 了解即可
  */
 public class NIOClient2 {
     public static final String HOST = "127.0.0.1";

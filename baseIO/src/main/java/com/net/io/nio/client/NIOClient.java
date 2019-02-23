@@ -9,8 +9,15 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * 1、打开选择器：选择器的作用就是注册相应channel的的事件 ，不论是客户端还是服务端都是通过selector来做事件监听
+ * 2、打开客户端socket通道：承载传输数据的通道
+ * 3、socket通道连接服务器
+ * 4、启动一个监听并处理事件的线程。原因：只要用了selector监听事件就要用一个独立的线程来处理。
+ */
 public class NIOClient {
     public static final String HOST = "127.0.0.1";
     public static final int PORT = 12121;
@@ -127,8 +134,10 @@ public class NIOClient {
      * 2、将数据放入buffer中再写入到channel
      * @param msg
      */
-    public boolean sendMsg(String msg) throws IOException {
-        if (!socketChannel.isConnected())return false;
+    public void sendMsg(String msg) throws IOException {
+        if (!socketChannel.isConnected()){
+            throw new RuntimeException("服务器还未连接，请稍后重试");
+        }
         //客户端向服务端发送信息都会等待一个结果。所以需要监听返回数据（读事件）
         socketChannel.register(selector,SelectionKey.OP_READ);
         byte[] bs =msg.getBytes();
@@ -137,23 +146,21 @@ public class NIOClient {
         byteBuffer.flip();
         //在buffer里读数据》然后向通道里写数据 ；所以需要调用flip方法
         socketChannel.write(byteBuffer);
-        return true;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        String NEW_LINE = System.getProperty("line.separator");
         NIOClient nioClient = new NIOClient();
         Thread.sleep(1000);
+        String str;
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            str = sc.next();
+            try {
+                //存在服务端返回的数据包含了多个数据包
+                nioClient.sendMsg(str + NEW_LINE);
 
-        //存在服务端返回的数据包含了多个数据包
-        boolean result = nioClient.sendMsg("123");
-        if (!result){
-            System.out.println("通道还未连接成功");
-            Thread.sleep(1000);
+            }catch (Exception e){}
         }
-        for (int i=0;i<5;i++){
-            nioClient.sendMsg("nihao");
-            Thread.sleep(1000);
-        }
-
     }
 }
