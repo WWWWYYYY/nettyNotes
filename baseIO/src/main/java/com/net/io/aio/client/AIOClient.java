@@ -7,6 +7,12 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * AIO不需要新启线程，AIO就是中任务读、写、接收、连接方法都是非阻塞的，调用connect、accept、read、write方法都是注册事件监听的行为，注册了以后等待系统调用CompletionHandler的complete方法
+ * com.net.io.aio包下的例子是一种错误的思路。
+ * 正确例子参考com.net.io.aio2包
+ */
+@Deprecated
 public class AIOClient {
     private AsynchronousSocketChannel socketChannel;
     private CountDownLatch countDownLatch;

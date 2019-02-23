@@ -1,4 +1,4 @@
-package com.net.io.aio.server;
+package com.net.io.aio2.server;
 
 import com.net.tool.ThreadLogUtil;
 
@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+
 /**
  * 写的CompletionHandler 第一个参数固定表示写时内容长度，第二个参数ByteBuffer
  *  * 参考：
  *  * socketChannel.write(byteBuffer,byteBuffer,new ServerWriteCompletionHandler(socketChannel));
  */
-@Deprecated
 public class ServerWriteCompletionHandler implements CompletionHandler<Integer,ByteBuffer> {
 private AsynchronousSocketChannel socketChannel;
     public ServerWriteCompletionHandler(AsynchronousSocketChannel socketChannel) {
@@ -28,7 +28,7 @@ private AsynchronousSocketChannel socketChannel;
             socketChannel.write(attachment,attachment,this);
         }else {
             try {
-                ThreadLogUtil.printMsg("服务端回复客户端["+socketChannel.getLocalAddress().toString()+"]完成,并重新等待客户端回复。。。");
+                ThreadLogUtil.printMsg("服务端回复客户端["+socketChannel.getRemoteAddress().toString()+"]完成,并重新等待客户端回复。。。");
             } catch (IOException e) {
                 e.printStackTrace();
             }

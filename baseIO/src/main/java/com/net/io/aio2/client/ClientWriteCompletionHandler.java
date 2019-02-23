@@ -1,4 +1,4 @@
-package com.net.io.aio.client;
+package com.net.io.aio2.client;
 
 import com.net.tool.ThreadLogUtil;
 
@@ -13,7 +13,6 @@ import java.util.concurrent.CountDownLatch;
  *  * 参考：
  *  * socketChannel.write(byteBuffer,byteBuffer,new ClientWriteCompletionHandler(socketChannel,countDownLatch));
  */
-@Deprecated
 public class ClientWriteCompletionHandler implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel socketChannel;
     private CountDownLatch countDownLatch;

@@ -1,4 +1,4 @@
-package com.net.io.aio.client;
+package com.net.io.aio2.client;
 
 import com.net.tool.ThreadLogUtil;
 
@@ -15,7 +15,6 @@ import java.util.concurrent.CountDownLatch;
  * 参考：
  * socketChannel.read(byteBuffer,byteBuffer,new ClientReadCompletionHandler(socketChannel,countDownLatch));
  */
-@Deprecated
 public class ClientReadCompletionHandler implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel socketChannel;
     private CountDownLatch countDownLatch;
@@ -32,6 +31,12 @@ public class ClientReadCompletionHandler implements CompletionHandler<Integer, B
      */
     @Override
     public void completed(Integer result, ByteBuffer attachment) {
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //flip操作：把当前游标值赋值给结束标志，重置游标为0，此时读取的才是有效数据
         attachment.flip();
 

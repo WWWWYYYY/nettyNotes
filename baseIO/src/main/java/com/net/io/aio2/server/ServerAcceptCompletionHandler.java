@@ -1,4 +1,4 @@
-package com.net.io.aio.server;
+package com.net.io.aio2.server;
 
 import com.net.tool.ThreadLogUtil;
 
@@ -12,7 +12,6 @@ import java.nio.channels.CompletionHandler;
  * 服务端 接收时CompletionHandler 第一个参数固定为AsynchronousSocketChannel，第二个参数自定义 参考
  * serverSocketChannel.accept(serverSocketChannel,new ServerAcceptCompletionHandler());
  */
-@Deprecated
 public class ServerAcceptCompletionHandler implements CompletionHandler<AsynchronousSocketChannel,AsynchronousServerSocketChannel> {
 
     /**
@@ -23,7 +22,7 @@ public class ServerAcceptCompletionHandler implements CompletionHandler<Asynchro
     @Override
     public void completed(AsynchronousSocketChannel socketChannel, AsynchronousServerSocketChannel serverSocketChannel) {
         try {
-            ThreadLogUtil.printMsg("客户端["+socketChannel.getLocalAddress().toString()+"]连接成功！！！");
+            ThreadLogUtil.printMsg("客户端["+socketChannel.getRemoteAddress().toString()+"]连接成功！！！");
         } catch (IOException e) {
             e.printStackTrace();
         }
