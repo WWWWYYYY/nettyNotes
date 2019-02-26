@@ -17,33 +17,37 @@ public class NettyClient {
      * 4、设置channel类型
      * 5、添加handler
      * 6、调用connect方法
+     *
      * @param args
      */
     public static void main(String[] args) throws InterruptedException {
-        Bootstrap bootstrap =new Bootstrap();
-        EventLoopGroup group =new NioEventLoopGroup();
-        bootstrap.remoteAddress("127.0.0.1",12121)
-                .group(group)
-                .channel(NioSocketChannel.class)
-                .handler(new ChannelHandler(){
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.remoteAddress("127.0.0.1", 12121)
+                    .group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ChannelHandler() {
 
-                    @Override
-                    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-                        System.out.println("已连接上服务器");
-                    }
+                        @Override
+                        public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+                            System.out.println("已连接上服务器");
+                        }
 
-                    @Override
-                    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-                        System.out.println("已退出服务器");
-                    }
+                        @Override
+                        public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+                            System.out.println("已退出服务器");
+                        }
 
-                    @Override
-                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                        System.out.println("exceptionCaught");
-                    }
-                });
-        ChannelFuture f = bootstrap.connect().sync();
-        f.channel().closeFuture().sync();
-        group.shutdownGracefully().sync();
+                        @Override
+                        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                            System.out.println("exceptionCaught");
+                        }
+                    });
+            ChannelFuture f = bootstrap.connect().sync();
+            f.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully().sync();
+        }
     }
 }

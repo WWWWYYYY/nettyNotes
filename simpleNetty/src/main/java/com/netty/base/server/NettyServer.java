@@ -19,33 +19,37 @@ public class NettyServer {
      * 5、childHandler
      * 6、调用bind方法启动
      * 7、调用sync()使得主线程阻塞
+     *
      * @param args
      * @throws InterruptedException
      */
     public static void main(String[] args) throws InterruptedException {
 
-        ServerBootstrap serverBootstrap =new ServerBootstrap();
-        EventLoopGroup group =new NioEventLoopGroup();
-        serverBootstrap.group(group)
-                .channel(NioServerSocketChannel.class)
-                .localAddress(12121).childHandler(new ChannelHandler(){
-            @Override
-            public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-                System.out.println("客户端已连接");
-            }
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(group)
+                    .channel(NioServerSocketChannel.class)
+                    .localAddress(12121).childHandler(new ChannelHandler() {
+                @Override
+                public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+                    System.out.println("客户端已连接");
+                }
 
-            @Override
-            public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-                System.out.println("客户端已断开");
-            }
+                @Override
+                public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+                    System.out.println("客户端已断开");
+                }
 
-            @Override
-            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                System.out.println("exceptionCaught");
-            }
-        });
-        ChannelFuture f = serverBootstrap.bind().sync();
-        f.channel().closeFuture().sync();
-        group.shutdownGracefully().sync();
+                @Override
+                public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                    System.out.println("exceptionCaught");
+                }
+            });
+            ChannelFuture f = serverBootstrap.bind().sync();
+            f.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully().sync();
+        }
     }
 }
