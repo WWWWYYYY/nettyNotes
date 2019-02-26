@@ -22,7 +22,6 @@ public class ClientConnectCompletionHandler implements CompletionHandler<Void,AI
      */
     @Override
     public void completed(Void result, AIOClient attachment) {
-//        countDownLatch.countDown();
         attachment.setStatus(AIOClient.CONNECTED);
         ThreadLogUtil.printMsg("result:"+result);
         ThreadLogUtil.printMsg("连接服务器成功！");

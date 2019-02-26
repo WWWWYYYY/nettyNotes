@@ -17,11 +17,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ClientReadCompletionHandler implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel socketChannel;
-    private CountDownLatch countDownLatch;
 
-    public ClientReadCompletionHandler(AsynchronousSocketChannel socketChannel, CountDownLatch countDownLatch) {
+    public ClientReadCompletionHandler(AsynchronousSocketChannel socketChannel) {
         this.socketChannel = socketChannel;
-        this.countDownLatch = countDownLatch;
     }
 
     /**
@@ -61,7 +59,6 @@ public class ClientReadCompletionHandler implements CompletionHandler<Integer, B
         ThreadLogUtil.printMsg(exc.getMessage());
         try {
             socketChannel.close();
-            countDownLatch.countDown();
         } catch (IOException e) {
             e.printStackTrace();
         }

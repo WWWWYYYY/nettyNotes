@@ -15,15 +15,10 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ClientWriteCompletionHandler implements CompletionHandler<Integer, ByteBuffer> {
     private AsynchronousSocketChannel socketChannel;
-    private CountDownLatch countDownLatch;
 
-    public ClientWriteCompletionHandler(AsynchronousSocketChannel socketChannel, CountDownLatch countDownLatch) {
-        this.socketChannel = socketChannel;
-        this.countDownLatch = countDownLatch;
-    }
+
     public ClientWriteCompletionHandler(AsynchronousSocketChannel socketChannel) {
         this.socketChannel = socketChannel;
-        this.countDownLatch = new CountDownLatch(1);
     }
     /**
      * 读完成时
@@ -37,7 +32,7 @@ public class ClientWriteCompletionHandler implements CompletionHandler<Integer, 
             socketChannel.write(attachment,attachment,this);
         }else {
             ByteBuffer byteBuffer =ByteBuffer.allocateDirect(1024);
-            socketChannel.read(byteBuffer,byteBuffer,new ClientReadCompletionHandler(socketChannel,countDownLatch));
+            socketChannel.read(byteBuffer,byteBuffer,new ClientReadCompletionHandler(socketChannel));
         }
     }
     /**
@@ -50,7 +45,6 @@ public class ClientWriteCompletionHandler implements CompletionHandler<Integer, 
         ThreadLogUtil.printMsg(exc.getMessage());
         try {
             socketChannel.close();
-            countDownLatch.countDown();
         } catch (IOException e) {
             e.printStackTrace();
         }
