@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.util.CharsetUtil;
 
@@ -18,17 +19,20 @@ public class NettyClient3 {
      * 如果使用自定的分割附对应DelimiterBasedFrameDecoder
      */
     public static String SEPARATOR =System.getProperty("line.separator");
-
+    //自定义分隔符
+    public static String MY_SEPARATOR ="!@#";
     private static class ChannelHandlerInit extends ChannelInitializer<Channel>{
 
         @Override
         protected void initChannel(Channel ch) throws Exception {
-            ch.pipeline().addLast(new LineBasedFrameDecoder(1024))
+//            ch.pipeline().addLast(new LineBasedFrameDecoder(1024))
+            ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,Unpooled.copiedBuffer(MY_SEPARATOR.getBytes())))
                     .addLast(new SimpleChannelInboundHandler<ByteBuf>() {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
                             for (int i=0;i<10;i++){
-                                String msg ="数字："+i+SEPARATOR;
+//                                String msg ="数字："+i+SEPARATOR;
+                                String msg ="数字："+i+MY_SEPARATOR;
                                 System.out.println("连接到服务器["+ctx.channel().remoteAddress()+"]并发送信息："+msg);
                                 ctx.writeAndFlush(Unpooled.copiedBuffer(msg.getBytes()));
                             }

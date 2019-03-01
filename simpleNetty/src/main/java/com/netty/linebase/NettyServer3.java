@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.util.CharsetUtil;
 
@@ -19,14 +20,17 @@ public class NettyServer3 {
      * 如果使用了系统的分割符对应的LineBasedFrameDecoder
      * 如果使用自定的分割附对应DelimiterBasedFrameDecoder
      */
-    public static String SEPARATOR =System.getProperty("line.separator");
+//    public static String SEPARATOR =System.getProperty("line.separator");
+    //自定义分隔符
+    public static String MY_SEPARATOR ="!@#";
 
     private static class ChannelInitializerImpl extends ChannelInitializer<Channel> {
         private AtomicInteger count = new AtomicInteger(0);
 
         @Override
         protected void initChannel(Channel ch) throws Exception {
-            ch.pipeline().addLast(new LineBasedFrameDecoder(1024))
+//            ch.pipeline().addLast(new LineBasedFrameDecoder(1024))
+            ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,Unpooled.copiedBuffer(MY_SEPARATOR.getBytes())))
                     .addLast(new SimpleChannelInboundHandler<ByteBuf>() {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -37,7 +41,8 @@ public class NettyServer3 {
                         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
 
                             System.out.println("接收到客户端【" + ctx.channel().remoteAddress() + "】信息" + count.getAndIncrement() + "：" + msg.toString(CharsetUtil.UTF_8));
-                            String msg2 = "nihao" + "，数字：" + count.get() + SEPARATOR;
+//                            String msg2 = "nihao" + "，数字：" + count.get() + SEPARATOR;
+                            String msg2 = "nihao" + "，数字：" + count.get() + MY_SEPARATOR;
                             ctx.channel().writeAndFlush(Unpooled.copiedBuffer(msg2.getBytes()));
                         }
 
