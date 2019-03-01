@@ -6,6 +6,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.CharsetUtil;
 
 /**
@@ -19,6 +22,13 @@ public class NettyHttpServer {
         @Override
         protected void initChannel(Channel ch) throws Exception {
             ChannelPipeline pipeline = ch.pipeline();
+            /*
+            //netty为我们提供的ssl加密，缺省
+            SelfSignedCertificate ssc = new SelfSignedCertificate();
+            SslContext sslCtx = SslContextBuilder.forServer(ssc.certificate(),
+                    ssc.privateKey()).build();
+            pipeline.addLast(sslCtx.newHandler(ch.alloc()));*/
+
             pipeline.addLast("decode", new HttpRequestDecoder());//对请求解码
             pipeline.addLast("encode", new HttpResponseEncoder());//对相应编码
             //对请求体做聚合操作，可能body太大要分好几次传输，而聚合操作让开发人员不要再去关系body的组装。
