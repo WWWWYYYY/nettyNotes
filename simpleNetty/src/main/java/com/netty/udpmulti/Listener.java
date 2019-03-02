@@ -46,9 +46,7 @@ public class Listener {
             Channel channel = bootstrap.bind().syncUninterruptibly().channel();
             System.out.println("UdpAnswerSide running");
             channel.closeFuture().sync();
-            //6、发送DatagramPacket报文
-//            channel.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Command.COMMAND_MAKE_RESP,CharsetUtil.UTF_8)
-//                    ,new InetSocketAddress("127.0.0.1",12121)));
+
             //不知道接收端能否收到报文，也不知道能否收到接收端的应答报文
             // 所以等待15秒后，不再等待，关闭通信
             if(!channel.closeFuture().await(150000)){
