@@ -67,10 +67,17 @@
             <version>1.7.25</version>
         </dependency>
 
+        <!--proto序列化依赖-->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>3.4.0</version>
+        </dependency>
+        <!--msgpack序列化依赖-->
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack</artifactId>
+            <version>0.6.12</version>
         </dependency>
     </dependencies>
     <build>
