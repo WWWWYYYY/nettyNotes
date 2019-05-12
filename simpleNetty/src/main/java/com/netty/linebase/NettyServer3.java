@@ -29,7 +29,9 @@ public class NettyServer3 {
 
         @Override
         protected void initChannel(Channel ch) throws Exception {
+            //方式一：系统提供的分割符解析
 //            ch.pipeline().addLast(new LineBasedFrameDecoder(1024))
+            //方式二：自定义分隔符解析
             ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,Unpooled.copiedBuffer(MY_SEPARATOR.getBytes())))
                     .addLast(new SimpleChannelInboundHandler<ByteBuf>() {
                         @Override

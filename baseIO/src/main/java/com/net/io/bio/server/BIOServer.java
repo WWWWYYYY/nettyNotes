@@ -38,8 +38,8 @@ public class BIOServer {
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 //                BufferedWriter bw =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 String command = null;
-                while ((command = reader.readLine()) != null) {
-                    if ("shutdown".equals(command)) {
+                while ((command = reader.readLine()) != null) {//当客户端异常关闭socket时，command==null
+                    if ("exit".equals(command)) {
                         break;
                     }
                     ThreadLogUtil.printMsg(ip + "[" + command + "]");
@@ -48,6 +48,7 @@ public class BIOServer {
 //                    bw.write("\n");
                     pw.flush();
                 }
+                ThreadLogUtil.printMsg("客户端["+socket.getInetAddress().toString()+":"+socket.getPort()+"]已关闭");
                 pw.close();
                 reader.close();
                 socket.close();
@@ -73,7 +74,7 @@ public class BIOServer {
             try {
                 //阻塞接收客户端
                 Socket client = server.accept();
-                ThreadLogUtil.printMsg("client[+" + client.getInetAddress().getHostAddress() + "]已连接");
+                ThreadLogUtil.printMsg("client[" + client.getInetAddress()+":"+client.getPort() + "]已连接");
                 //将socket打包成 runnable 丢进线程池
                 executor.execute(new SocketThread(client));
             } catch (IOException e) {
